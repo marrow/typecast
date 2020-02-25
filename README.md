@@ -1,15 +1,13 @@
-# $project
-
-> This is a project template, meant for duplication and use as a starting point. Please search through these files for any occurrences of, and populate: `$project`, `$package`, `$version`, `$repo`, ...
+# Marrow Typecast
 
 [![][latestversion]][latestversion_] [![][ghtag]][ghtag_] [![][masterstatus]][masterstatus_] [![][mastercover]][mastercover_] [![][masterreq]][masterreq_] [![][ghwatch]][ghsubscription] [![][ghstar]][ghsubscription]
 
 > © 2020 Alice Bevan-McGregor and contributors.
 
+> https://github.com/marrow/typecast
 
-> https://github.com/marrow/$repo
+Utilize Python 3 function annotations for rich, structured typecasting, not just type validation and hinting, through direct specification and inference.
 
-Please describe the package here in few sentences; the goal is about a paragraph. Something easy to digest, but not too brief to give a good idea of what the package is for. For example, this is not a real package, it's a package template for "unpacking" on GitHub using their Repository Templates feature. You won't find this on the Python Package Index (Pypi).
 
 ## Contents
 
@@ -28,18 +26,20 @@ Please describe the package here in few sentences; the goal is about a paragraph
 
 ## Overview
 
-Provide a more detailed or in-depth description here, being sure to cover both rationale and goals.
+A fairly substantial number of packages exist for the purpose of de-serializing data coming in from the web. Many utilize dedicated schemas, or declarative mechanisms to explicitly define a data model for the purpose of listening to that side of the conversation, sometimes also incorporating re-serialization out in various ways such as form widget libraries, JSON data, &c. Most use decorators to serve the role of "annotating" functions. Many of these were developed with legacies starting in Python 2, prior to the addition of [function annotations](https://www.python.org/dev/peps/pep-3107/) in Python 3.
+
+Until such time as [PEP 593](https://www.python.org/dev/peps/pep-0593/) (_Flexible function and variable annotations_) hits release and wide adoption in Python 3.9, this package aims to provide such functionality explicitly, where annotations are explicit, and through inference more generally.  There will be a bias towards the context of web-based and command-line invocation.  In the abstract, this can eliminate the need for "form libraries" et. al. for resolving simpler or more common problems.
 
 
 ## Installation
 
-Installing `$project` is easy, just execute the following in a terminal:
+Installing `marrow.typecast` is easy, just execute the following in a terminal:
 
-	pip install $project
+	pip install marrow.typecast
 
 **Note:** We *strongly* recommend always using a container, virtualization, or sandboxing environment of some kind when developing using Python. We highly recommend use of the Python standard [`venv` (_"virtual environment"_) mechanism][venv].
 
-If you add `$project` to the `install_requires` argument of the call to `setup()` in your application's `setup.py` or `setup.cfg` files, $project will be automatically installed and made available when your own application or library is installed. Use `$project ~= $version` to get all bugfixes for the current release while ensuring that large breaking changes are not installed by limiting to the same major/minor, >= the given patch level.
+If you add `marrow.typecast` to the `install_requires` argument of the call to `setup()` in your application's `setup.py` or `setup.cfg` files, `marrow.typecast` will be automatically installed and made available when your own application or library is installed. Use `marrow.typecast ~= 1.0.0` to get all bug fixes for the current release while ensuring that large breaking changes are not installed by limiting to the same major/minor, >= the given patch level.
 
 This package has the following dependencies:
 
@@ -50,12 +50,12 @@ This package has the following dependencies:
 
 > [![][developstatus]][developstatus_] [![][developcover]][developcover_] [![][ghsince]][ghsince_] [![][ghissues]][ghissues_] [![][ghfork]][ghfork_]
 
-Development takes place on [GitHub][github] in the [$repo][repo] project. Issue tracking, documentation, and downloads are provided there.
+Development takes place on [GitHub][github] in the [typecast][repo] project. Issue tracking, documentation, and downloads are provided there.
 
 Installing the current development version requires [Git][git]), a distributed source code management system. If you have Git you can run the following to download and *link* the development version into your Python runtime:
 
-	git clone https://github.com/marrow/$repo.git
-	pip install -e '$repo[development]'
+	git clone https://github.com/marrow/typecast.git
+	pip install -e 'typecast[development]'
 
 You can then upgrade to the latest version at any time, from within that source folder:
 
@@ -67,17 +67,44 @@ If you would like to make changes and contribute them back to the project, fork 
 
 ## Getting Started
 
-Describe the basic steps required to utilize this package. Provide additional sections or subsections as needed. If this documentation exceeds an additional section or two, consider writing a GitBook instead.
+General usage involves defining a function or method with annotations and decorating it using the `cast` decorator.
+
+```py
+from typing import Optional, Set
+
+from marrow.typecast import cast
+
+
+@cast
+def sample(name:str, age:int, tags:Optional[Set[str]]=None):
+	return name, age, tags
+```
+
+Attempts to typecast will raise `TypeError` and `ValueError` exceptions where appropriate to indicate a fundamental incompatibility or content incompatibility, respectively. For example, passing a literal `None` as the `age` parameter will result in a `TypeError` exception. Passing the string `"bob"` will result in a `ValueError`, as that string is not number-like, but number-like strings are usable.
+
+When invoked, values will be recursively cast as needed:
+
+```py
+>>> sample("amcgregor", "27", tags=["27", 42, 53])
+("amcgregor", 27, {"27", "42", "53"})
+```
+
+
+### Framework Usage
+
+You may wish to expose functions through an external interface such as a web-based API or command line script. If the framework you are using is aware of / utilizes this library or if this library provides a plugin suitable for integrated use, this can eliminate any direct need for the decorator.  This will theoretically save a stack frame and the overhead of a nested function call if your framework will do this already.
+
+This is generally unnecessary, however, as "aware" integrations will bypass the decoration and that overhead anyway. Permitting you to utilize your code both as a native Python API, and as a web-based API, command-line script, etc. as desired. Needs vary.
 
 
 ## Version History
 
-This project has yet to make any releases. When it does, each release should be documented here with a sub-section for the version, and a bulleted list of itemized changes tagged with the kind of change, e.g. *fixed*, *added*, *removed*, or *deprecated*.
+This project has yet to make any releases. When it does, each release will be documented here with a sub-section for the version, and a bulleted list of itemized changes tagged with the kind of change, e.g. *fixed*, *added*, *removed*, or *deprecated*. Each will also include relevant links to the release on GitHub, and any involved issues / pull requests.
 
 
 ## License
 
-$project has been released under the MIT Open Source license.
+Marrow Typecast has been released under the MIT Open Source license.
 
 ### The MIT License
 
@@ -93,38 +120,38 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
 [venv]: https://docs.python.org/3/tutorial/venv.html
 
 [git]: http://git-scm.com/
-[repo]: https://github.com/marrow/$repo/
+[repo]: https://github.com/marrow/typecast/
 [github]: https://github.com/
 [ghhelp]: https://help.github.com/
 
 
-[ghwatch]: https://img.shields.io/github/watchers/marrow/$repo.svg?style=social&label=Watch "Subscribe to project activity on GitHub."
-[ghstar]: https://img.shields.io/github/stars/marrow/$repo.svg?style=social&label=Star "Star this project on GitHub."
-[ghsubscription]: https://github.com/marrow/cinje/subscription
-[ghfork]: https://img.shields.io/github/forks/marrow/$repo.svg?style=social&label=Fork "Fork this project on Github."
-[ghfork_]: https://github.com/marrow/cinje/fork
+[ghwatch]: https://img.shields.io/github/watchers/marrow/typecast.svg?style=social&label=Watch "Subscribe to project activity on GitHub."
+[ghstar]: https://img.shields.io/github/stars/marrow/typecast.svg?style=social&label=Star "Star this project on GitHub."
+[ghsubscription]: https://github.com/marrow/typecast/subscription
+[ghfork]: https://img.shields.io/github/forks/marrow/typecast.svg?style=social&label=Fork "Fork this project on Github."
+[ghfork_]: https://github.com/marrow/typecast/fork
 
-[masterstatus]: http://img.shields.io/travis/marrow/$repo/master.svg?style=flat "Production build status."
-[masterstatus_]: https://travis-ci.org/marrow/cinje/branches
-[mastercover]: http://img.shields.io/codecov/c/github/marrow/$repo/master.svg?style=flat "Production test coverage."
-[mastercover_]: https://codecov.io/github/marrow/cinje?branch=master
-[masterreq]: https://img.shields.io/requires/github/marrow/$repo.svg "Status of production dependencies."
-[masterreq_]: https://requires.io/github/marrow/cinje/requirements/?branch=master
+[masterstatus]: http://img.shields.io/travis/marrow/typecast/master.svg?style=flat "Production build status."
+[masterstatus_]: https://travis-ci.org/marrow/typecast/branches
+[mastercover]: http://img.shields.io/codecov/c/github/marrow/typecast/master.svg?style=flat "Production test coverage."
+[mastercover_]: https://codecov.io/github/marrow/typecast?branch=master
+[masterreq]: https://img.shields.io/requires/github/marrow/typecast.svg "Status of production dependencies."
+[masterreq_]: https://requires.io/github/marrow/typecast/requirements/?branch=master
 
-[developstatus]: http://img.shields.io/travis/marrow/$repo/develop.svg?style=flat "Development build status."
-[developstatus_]: https://travis-ci.org/marrow/cinje/branches
-[developcover]: http://img.shields.io/codecov/c/github/marrow/$repo/develop.svg?style=flat "Development test coverage."
-[developcover_]: https://codecov.io/github/marrow/cinje?branch=develop
-[developreq]: https://img.shields.io/requires/github/marrow/$repo.svg "Status of development dependencies."
-[developreq_]: https://requires.io/github/marrow/cinje/requirements/?branch=develop
+[developstatus]: http://img.shields.io/travis/marrow/typecast/develop.svg?style=flat "Development build status."
+[developstatus_]: https://travis-ci.org/marrow/typecast/branches
+[developcover]: http://img.shields.io/codecov/c/github/marrow/typecast/develop.svg?style=flat "Development test coverage."
+[developcover_]: https://codecov.io/github/marrow/typecast?branch=develop
+[developreq]: https://img.shields.io/requires/github/marrow/typecast.svg "Status of development dependencies."
+[developreq_]: https://requires.io/github/marrow/typecast/requirements/?branch=develop
 
-[ghissues]: http://img.shields.io/github/issues-raw/marrow/$repo.svg?style=flat "Github Issues"
-[ghissues_]: https://github.com/marrow/cinje/issues
-[ghsince]: https://img.shields.io/github/commits-since/marrow/$repo/$version.svg "Changes since last release."
-[ghsince_]: https://github.com/marrow/cinje/commits/develop
-[ghtag]: https://img.shields.io/github/tag/marrow/$repo.svg "Latest Github tagged release."
-[ghtag_]: https://github.com/marrow/cinje/tree/$version
-[latestversion]: http://img.shields.io/pypi/v/$project.svg?style=flat "Latest released version on Pypi."
-[latestversion_]: https://pypi.python.org/pypi/$project
+[ghissues]: http://img.shields.io/github/issues-raw/marrow/typecast.svg?style=flat "Github Issues"
+[ghissues_]: https://github.com/marrow/typecast/issues
+[ghsince]: https://img.shields.io/github/commits-since/marrow/typecast/1.0.svg "Changes since last release."
+[ghsince_]: https://github.com/marrow/typecast/commits/develop
+[ghtag]: https://img.shields.io/github/tag/marrow/typecast.svg "Latest Github tagged release."
+[ghtag_]: https://github.com/marrow/typecast/tree/1.0
+[latestversion]: http://img.shields.io/pypi/v/marrow.typecast.svg?style=flat "Latest released version on Pypi."
+[latestversion_]: https://pypi.python.org/pypi/marrow.typecast
 
 [cake]: http://img.shields.io/badge/cake-lie-1b87fb.svg?style=flat
