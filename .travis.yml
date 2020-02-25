@@ -1,0 +1,39 @@
+language: python
+cache: pip
+
+branches:
+  except:
+    - /^feature/.*$/ # Work In-progress; covered by explicit pull request testing.
+
+python:
+  - pypy3
+  - "3.5"
+  - "3.6"
+
+matrix:
+    include:
+        - python: "3.7"
+          dist: xenial
+
+install:
+ - 'travis_retry pip install -U setuptools pip "setuptools_scm>=1.9" cffi  # Python packaging and interop.'
+ - 'travis_retry pip install -U pytest pytest-cov codecov  # Test execution and reporting tools.'
+ - 'make unpack_test  # Expand variables suitable for testing.'
+ - 'pip install -e ".[development]"  # Install project and dependencies.'
+
+script: pytest
+
+after_script:
+    bash <(curl -s https://codecov.io/bash)
+
+notifications:
+  irc:
+    channels:
+      - 'irc.freenode.org#webcore'
+    use_notice: true
+    skip_join: true
+    on_success: change
+    on_failure: always
+    template:
+      - "%{repository_slug}:%{branch}@%{commit} %{message}"
+      - "Duration: %{duration} - Details: %{build_url}"
